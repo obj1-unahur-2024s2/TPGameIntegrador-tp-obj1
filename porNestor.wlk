@@ -1,5 +1,7 @@
-
+import configuraciones.*
 import wollok.game.*
+
+// OBJETOS, NAVES Y MISILES
 
 object horda {
   var property nivel = 1 // construir lógica para seleccionar niveles.
@@ -7,7 +9,7 @@ object horda {
   const property filasEnemigas = []
   var property filaActual = 9
   method agregarFila(){
-    self.filasEnemigas().add([new NaveEnemiga(x=1, y=filaActual), new NaveEnemiga(x=2, y=filaActual), new NaveEnemiga(x=3, y=filaActual), new NaveEnemiga(x=4, y=filaActual), new NaveEnemiga(x=5, y=filaActual), new NaveEnemiga(x=6, y=filaActual), new NaveEnemiga(x=7, y=filaActual) ,new NaveEnemiga(x=8, y=filaActual)])
+    self.filasEnemigas().addAll([new NaveEnemiga(x=0, y=filaActual), new NaveEnemiga(x=2, y=filaActual), new NaveEnemiga(x=4, y=filaActual), new NaveEnemiga(x=6, y=filaActual), new NaveEnemiga(x=8, y=filaActual)])
     filaActual = 2.max(filaActual - 1)
   }
 
@@ -16,9 +18,8 @@ object horda {
   }
 
   method atacar(){
-    self.filasEnemigas().last().forEach({x=>x.disparar()})
+    self.filasEnemigas().forEach({x=>x.disparar()})
   }
-
 }
 
 
@@ -31,27 +32,32 @@ class NaveEnemiga{
   method esElJugador()= false
   method initialize(){
     game.addVisual(self)
-    game.onTick(10000, "inicio", {puedeMover = true})
-    game.onTick(500, "movimiento", {self.mover()})
+    game.onTick(5000, "inicio", {puedeMover = true})
+    game.onTick(500, "movimiento", {self.moverseSiPuede()})
   }
 
-    method mover(){
-      if(puedeMover){
-        position = position.right(direccion)
-        if (position.x() >= game.width() - 1) {
-          position = position.down(1)
-          direccion = -1
-        }
-        if (position.x() <= 0) {
-          position = position.down(1)
-          direccion = 1
-        }
-      }
+  method moverseSiPuede(){
+    if(puedeMover){
+      self.mover()
     }
+  }
+
+  method mover(){
+    position = position.right(direccion)
+    if (position.x() >= game.width() - 1) {
+      position = position.down(1)
+      direccion = -1
+    }
+    if (position.x() <= 0) {
+      position = position.down(1)
+      direccion = 1
+    } 
+  }
 
   method image() = "naveEnemiga.png"
+
   method disparar(){
-    if(0.randomUpTo(5).truncate(0) == 0 and puedeMover){
+    if(0.randomUpTo(5).truncate(0) == 0 and puedeMover){ // posibilidad de 1 entre 5 para efectuar el disparo
       game.addVisual(new MisilEnemigo(x=self.position().x(), y=self.position().y()-1))
     }
   }
@@ -62,18 +68,16 @@ class Misil{
     var property x
     var property y
     var property position = game.at(x, y)
-    var property imagenActual = "misil_up1.png"
+    var property imagenActual = "laser.png"
 
-    method image()= imagenActual
+    method image()
     method initialize(){
-        game.onTick(200, "animacion_misil", {self.cambiarImagen()})
         game.onTick(200, "avanzar", {self.avanzar()})
         game.onCollideDo(self, {enemigo=>
           game.removeVisual(enemigo)
           game.removeVisual(self)
           } )
     }
-    method cambiarImagen()
     method avanzar()
     method seSalioDelTablero(){
         return (self.position().y() == game.height()-1) or (self.position().y() == (-1))
@@ -81,13 +85,7 @@ class Misil{
 }
 
 class MisilPropio inherits Misil{
-    override method cambiarImagen(){
-        if (imagenActual == "misil_up1.png"){
-            imagenActual = "misil_up2.png"
-        }else{
-            imagenActual = "misil_up1.png"
-        }  
-    }
+    override method image()="laser.png"
     override method avanzar(){
         if(self.seSalioDelTablero()){
             game.removeVisual(self)
@@ -97,17 +95,10 @@ class MisilPropio inherits Misil{
 }
 
 class MisilEnemigo inherits Misil{
+   override method image()="laserEnemigo.png"
     override method initialize(){
-        game.onTick(200, "animacion_misil", {self.cambiarImagen()})
         game.onTick(200, "avanzar", {self.avanzar()})
-        game.onCollideDo(self, {enemigo=>if(enemigo.esElJugador()){game.removeVisual(enemigo)} }) // daña solo al jugador
-    }
-    override method cambiarImagen(){
-        if (imagenActual == "misil_down1.png"){
-            imagenActual = "misil_down2.png"
-        }else{
-            imagenActual = "misil_down1.png"
-        }  
+        game.onCollideDo(self, {enemigo=>if(enemigo.esElJugador()){niveles.gameOver()} }) // daña solo al jugador y termina el juego
     }
     override method avanzar(){
         if(self.seSalioDelTablero()){
@@ -121,6 +112,7 @@ class MisilEnemigo inherits Misil{
 object jugador {
   var property position = game.at(5, 0)
   var property misilCargado= misil
+  var property vida = 100
 
   method esElJugador()= true
   // Mover izquierda o derecha, luego deberiamos ponerlo dentro de configurar teclado
@@ -129,22 +121,32 @@ object jugador {
   }
 
   method moverDerecha() { if (position.x()<game.width()-1) position = position.right(1)}
-
   method cargarMisil(unMisil) {
     misilCargado=unMisil
   }
-
- 
-
   method image() = "naveJugador.png"
-
-
   method disparar(){
     game.addVisual(new MisilPropio(x=self.position().x(), y=self.position().y()+1))
   }
+  // CAJAS
+  method consumir(unObjeto){
+    vida = 0.max(vida + unObjeto.propiedades())
+    if(self.vida() == 0) niveles.gameOver()
+  }
 }
 
+class Caja{
+  var property x
+  var property y
+  var property position = game.at(x, y)
 
+  method initialize(){
+    //
+  }
+
+  method propiedades()= 50
+  // hay que ver que pasa si el jugador consume la caja.
+}
 
 
 //  Me faltó
@@ -152,8 +154,7 @@ object jugador {
 // Hacer funsionar la explosión
 // Ver si es posible hacer una sola clase Nave y de ahí derivar la NaveEnemiga y al jugador
 // optimizar algunos métodos e incluír la lógica de disparos y adaptar al polimorfísmo.
-//
-//
+
 
 class Misild {
   var property position = game.at(0, -1)
