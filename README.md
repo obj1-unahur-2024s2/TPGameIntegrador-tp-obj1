@@ -1,10 +1,11 @@
-# Nombre del juego (<- borrar y completar)
+# Space Invaders
 
 ## Equipo de desarrollo
 
-- Alguien
-- Persona
-- etc.
+- Obeid Nestor
+- Silvero Owen
+- Milinelli Maximiliano
+- Ponce Naara
 
 ## Capturas
 
@@ -12,11 +13,18 @@
 
 ## Reglas de Juego / Instrucciones
 
-(Escribirlas)
+En el juego eres una nave futurista que dispara proyectiles.
+Debes proteger la galaxia de las naves enemigas.
+Pasarás por 3 distintas zonas, cada una más dificil que la anterior.
+
+Movimiento: flecha izquierda y flecha derecha
+Disparar: espacio
+
+El juego termina cuando, o el jugador es alcanzado por un proyectil o por una nave enemiga, o una nave enemiga llega a la zona que el jugador debe proteger.
 
 
 ## Otros
 
-- Curso/Facultad
-- Versión de wollok
-- Una vez terminado, no tenemos problemas en que el repositorio sea público / queremos manternerlo privado
+- Unahur, comisión 1b
+- Versión de wollok 0.2.8
+- Una vez terminado, no tenemos problemas en que el repositorio sea público
