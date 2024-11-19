@@ -1,0 +1,25 @@
+import porNestor.*
+
+program galaxy {
+
+    game.height(10)
+    game.width(10)
+    game.cellSize(50)
+    game.boardGround("fondoEspacio.png")
+  horda.agregarFila()
+  horda.agregarFila()
+
+
+  game.addVisual(jugador)
+
+
+
+  keyboard.left().onPressDo { jugador.moverIzquierda() }
+  keyboard.right().onPressDo { jugador.moverDerecha() }
+  keyboard.space().onPressDo {jugador.disparar()}
+ 
+
+  
+
+  game.start()
+}
