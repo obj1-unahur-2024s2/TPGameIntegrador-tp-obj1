@@ -1,24 +1,10 @@
-import porNestor.*
+import configuraciones.*
 import wollok.game.*
+import naves.*
+import horda.*
+
 program galaxy {
-
-  game.height(10)
-  game.width(10)
-  game.cellSize(50)
-  
-  game.boardGround("gameOver.png") 
-  //como el fondo no se puede cambiar ni remover, se dejará el de gameOver para que al hacer game.clear() únicamente se muestre dicha imagen
-  //Posteriormente se ejecuta un game.stop()
-
- // ver primero como integrarlo
-  //keyboard.r().onPressDo{
-  //  jugador.cargarMisil(misilDoble)
-  //  game.removeVisual(misil)
-  //  game.addVisual(misilDoble)
-  //  misilDoble.position(jugador.position())
-  //}
-  
-
+  juego.configurarJuego()
   game.start()
 }
 
