@@ -2,6 +2,7 @@ import horda.*
 import municiones.*
 import configuraciones.*
 import wollok.game.*
+import juego.*
 
 class Nave{
   method image()
@@ -11,10 +12,12 @@ class Nave{
 object jugador inherits Nave{
   var property position = game.at(5, 0)
   var property misilCargado= 0 // MUNISION 
-  var imagenActual = "naveJugador.png"
+  var property imagenActual = "naveJugador.png"
+
+  override method image() = imagenActual
 
   method initialize(){
-    game.schedule(200, {self.alternarImagen()})
+    game.onTick(200, "alternarImagen",  {self.alternarImagen()})
   }
   method moverIzquierda() {
     if (position.x()>0) position = position.left(1)
@@ -25,19 +28,20 @@ object jugador inherits Nave{
   method cargarMisil(unMisil) {
     misilCargado=unMisil
   }
-  override method image() = imagenActual
+
   override method disparar(){
     juego.agregarEntidad(new MisilPropio(x=self.position().x(), y=self.position().y()+1))
   }
   method serImpactado(){
-    niveles.gameOver()
+    configurarNiveles.gameOver()
   }
   method alternarImagen(){
-    if (imagenActual == "naveJugador.png"){
+    if (self.imagenActual() == "naveJugador.png"){
         imagenActual = "naveJugador2.png"
-    }else{
-        imagenActual = "naveJugador.png"
-    }  
+    }
+    if (self.imagenActual() == "naveJugador.png"){
+      imagenActual = "naveJugador2.png"
+      }
   }
 }
 
@@ -81,12 +85,12 @@ class NaveEnemiga inherits Nave{
       }
   }
   method serImpactado(unaCosa){
-    niveles.gameOver()
+    configurarNiveles.gameOver()
   }
   method invadirSiSePuede(){
     if (self.position().y() == 0){
       game.removeTickEvent("avanzar")
-      game.schedule(500, {niveles.gameOver()})
+      game.schedule(500, {configurarNiveles.gameOver()})
     }
   }
 }

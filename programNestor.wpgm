@@ -2,7 +2,7 @@ import configuraciones.*
 import wollok.game.*
 import naves.*
 import horda.*
-
+import juego.*
 program galaxy {
   juego.configurarJuego()
   game.start()

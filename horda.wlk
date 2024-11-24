@@ -2,6 +2,7 @@ import configuraciones.*
 import wollok.game.*
 import naves.*
 import municiones.*
+import juego.*
 // OBJETOS, NAVES Y MISILES
 
 object horda {
@@ -14,7 +15,7 @@ object horda {
   }
 
   method comenzar(){
-    //game.onTick(1000, "ataqueHorda", {self.atacar()})
+    game.onTick(3000, "ataqueHorda", {self.atacar()})
   }
 
   method atacar(){
@@ -22,9 +23,9 @@ object horda {
   }
 
   method removerNave(unaNave){
-    unaNave.alternarMovimiento()
-    filasEnemigas.remove(unaNave)
-    game.removeVisual(unaNave)
+    unaNave.alternarMovimiento() //que se detenga
+    filasEnemigas.remove(unaNave)//eliminarla de las filas
+    game.removeVisual(unaNave) //eliminar su visual
   }
 }
 
@@ -40,8 +41,8 @@ object horda {
 
 
 class Explosion {
-  var x
-  var y
+  const x
+  const y
   var property position = game.at(x, y) 
   var imagenActual = "explosion1.png"
 

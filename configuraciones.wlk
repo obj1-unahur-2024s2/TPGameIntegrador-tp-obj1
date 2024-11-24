@@ -2,9 +2,9 @@ import horda.*
 import wollok.game.*
 import naves.*
 import municiones.*
+import juego.*
 // APARTADO APARTE PARA CONFIGURACIONES, YA QUE NO ES POSIBLE ACCEDER A LOS OBJETOS DENTRO DEL ARCHIVO .WPGM
 object configurarNiveles{
-
   method initialize(){
     game.addVisual(niveles)
     self.pantallaDeInicio()
@@ -42,15 +42,41 @@ object configurarNiveles{
     horda.agregarFila()
   }
 
+  method gameOver(){
+    game.clear()
+    game.schedule(200, {game.stop()})
+  }
+  method youWin(){
+    game.clear()
+    niveles.cambiarImagen("youWin.png")
+    game.addVisual(niveles)
+    game.schedule(200, {game.stop()})
+  }
+
   method terminarSiNoHayMasEnemigos(){
     if(!self.elJuegoEstaEnCurso()){
-      niveles.youWin()
+      self.youWin()
     }
   }
-  method elJuegoEstaEnCurso(){
-    return horda.filasEnemigas().size() >= 1
-  }
+  method elJuegoEstaEnCurso()= !horda.filasEnemigas().isEmpty()
 }
+
+object niveles{
+  var property position = game.at(0,0)
+  var imagenActual = "niveles.png"
+  method image()= imagenActual
+
+  method fondoNivel(x, y){
+    position = game.at(x, y)
+  }
+
+  method cambiarImagen(unaImagen){
+    imagenActual = unaImagen
+    position = game.at(0, 0)
+  }
+
+}
+
 
 object configuracionDeControles{
     method cargarControlesJugador(){
@@ -66,41 +92,4 @@ object configuracionDeControles{
   }
 }
 
-object niveles{
-  var property position = game.at(0,0)
-  method image()= "niveles.png"
 
-  method fondoNivel(x, y){
-    position = game.at(x, y)
-  }
-
-  method gameOver(){
-    game.boardGround("gameOver.png")
-    game.clear()
-    game.schedule(300, {game.stop()})
-  }
-  method youWin(){
-    game.addVisual(juego)
-    game.schedule(100, {game.stop()})
-  }
-}
-
-object juego{
-  const property municionEnPantalla = []
-  
-  method configurarJuego(){
-    game.boardGround("gameOver.png")
-    game.height(10)
-    game.width(10)
-    game.cellSize(50)
-  }
-  method image()= "youWin.png"
-  method agregarEntidad(unaEntidad){
-    municionEnPantalla.add(unaEntidad)
-  }
-
-  method removerEntidad(unaEntidad){
-    municionEnPantalla.remove(unaEntidad)
-    game.removeVisual(unaEntidad)
-  }
-}
